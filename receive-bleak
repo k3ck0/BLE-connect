@@ -2,8 +2,9 @@ import asyncio
 from bleak import BleakClient
 
 # UUIDs (müssen mit denen auf dem ESP32 übereinstimmen)
-SERVICE_UUID = "12345678-1234-1234-1234-123456789012"
-TEMPERATURE_CHARACTERISTIC_UUID = "87654321-4321-4321-4321-210987654321"
+SERVICE_UUID = "2c60db1d-49ca-4afa-9bf6-87bca770c632"
+TEMPERATURE_CHARACTERISTIC_UUID = "67c2990c-7602-47b1-a525-df294435e2f1"
+HUMIDITY_CHARACTERISTIC_UUID = "59456056-3ed9-4f89-9622-0c672224cb12"
 
 # Name des BLE-Geräts (muss mit dem Namen auf dem ESP32 übereinstimmen)
 DEVICE_NAME = "Sensor01"
@@ -12,7 +13,7 @@ async def main():
     print("Searching for BLE device...")
 
     # Scanne nach dem Gerät
-    devices = await BleakClient.discover()
+    devices = await BleakScanner.discover()
     for device in devices:
         if device.name == DEVICE_NAME:
             print(f"Found device: {device.name} ({device.address})")
