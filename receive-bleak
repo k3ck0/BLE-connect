@@ -1,0 +1,41 @@
+import asyncio
+from bleak import BleakClient
+
+# UUIDs (müssen mit denen auf dem ESP32 übereinstimmen)
+SERVICE_UUID = "12345678-1234-1234-1234-123456789012"
+TEMPERATURE_CHARACTERISTIC_UUID = "87654321-4321-4321-4321-210987654321"
+
+# Name des BLE-Geräts (muss mit dem Namen auf dem ESP32 übereinstimmen)
+DEVICE_NAME = "Sensor01"
+
+async def main():
+    print("Searching for BLE device...")
+
+    # Scanne nach dem Gerät
+    devices = await BleakClient.discover()
+    for device in devices:
+        if device.name == DEVICE_NAME:
+            print(f"Found device: {device.name} ({device.address})")
+            async with BleakClient(device.address) as client:
+                print(f"Connected to {DEVICE_NAME}")
+
+                # Überprüfe, ob der Service und die Characteristic verfügbar sind
+                services = await client.get_services()
+                for service in services:
+                    if service.uuid == SERVICE_UUID:
+                        print(f"Found service: {service.uuid}")
+                        for characteristic in service.characteristics:
+                            if characteristic.uuid == TEMPERATURE_CHARACTERISTIC_UUID:
+                                print(f"Found characteristic: {characteristic.uuid}")
+
+                                # Lies den Temperaturwert
+                                temperature_data = await client.read_gatt_char(TEMPERATURE_CHARACTERISTIC_UUID)
+                                temperature = float.from_bytes(temperature_data, byteorder='little')
+                                print(f"Temperature: {temperature} °C")
+
+            break
+    else:
+        print(f"Device '{DEVICE_NAME}' not found.")
+
+# Führe das Skript aus
+asyncio.run(main())
